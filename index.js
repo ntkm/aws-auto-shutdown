@@ -1,6 +1,6 @@
-const REGION = 'ap-northeast-1a';
+const REGION = 'ap-northeast-1';
 
-var moment = require("moment");
+var moment = require('moment');
 var async = require('async');
 
 var AWS = require('aws-sdk');
@@ -73,7 +73,7 @@ exports.handler = function(event, context) {
     Filters: [
       {
         Name: 'tag-key',
-        Values: ['Start']
+        Values: ['Start', 'Stop']
       }
     ]
   };
@@ -83,6 +83,7 @@ exports.handler = function(event, context) {
     else {
       async.forEach(data.Reservations, function(reservation, callback) {
         var instance = reservation.Instances[0];
+        console.log('Instance: id = ' + instance.instanceId)
 
         if (shouldStart(instance)) {
           console.log('Start instance: id = ' + instance.instanceId);
@@ -92,7 +93,7 @@ exports.handler = function(event, context) {
           handleInsrance(ec2, instance, 'stop', function() { callback(); });
         }
       }, function() {
-        console.log('all done.');
+        console.log('ALL done.');
         context.succeed('OK');
       });
     }
