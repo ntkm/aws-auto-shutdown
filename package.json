@@ -1,0 +1,15 @@
+{
+  "name": "aws-auto-shutdown",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^1.5.2",
+    "aws-sdk": "^2.2.48",
+    "moment": "^2.12.0"
+  },
+  "devDependencies": {},
+  "scripts": {},
+  "author": "Takumi Nakagawa",
+  "license": "ISC"
+}
