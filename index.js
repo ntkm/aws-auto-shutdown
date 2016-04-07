@@ -4,6 +4,7 @@ var moment = require('moment');
 var async = require('async');
 
 var AWS = require('aws-sdk');
+AWS.config.loadFromPath('secrets/credentials.json');
 AWS.config.region = REGION
 
 function shouldStart(instance) {
@@ -11,7 +12,7 @@ function shouldStart(instance) {
 
   var now = moment().utcOffset("+09:00");
   var month = now.get('month') + 1;
-  var start = moment(now.get('year') + '-' + month + '-' + now.get('date') + ' ' + getHour(startTag.Value) + ':' + getMinute(startTag.Value) + ' +09:00', 'YYYY-MM-DD HH:mm Z');
+  var start = moment(now.get('year') + '-' + month + '-' + now.get('date') + ' ' + startTag.Value + ' +09:00', 'YYYY-MM-DD HH:mm Z');
 
   // see alse: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/EC2.html#describeInstances-property
   return now >= start && instance.State.Name === 'stopped'
@@ -47,7 +48,7 @@ function getDate(time24) {
 function handleInstance(ec2, instance, toHandle, callback) {
   var params = {
     InstanceIds: [
-      instance.instanceId
+      instance.InstanceId
     ],
   };
 
@@ -73,7 +74,7 @@ exports.handler = function(event, context) {
     Filters: [
       {
         Name: 'tag-key',
-        Values: ['Start', 'Stop']
+        Values: ['Start']
       }
     ]
   };
@@ -83,13 +84,13 @@ exports.handler = function(event, context) {
     else {
       async.forEach(data.Reservations, function(reservation, callback) {
         var instance = reservation.Instances[0];
-        console.log('Instance: id = ' + instance.instanceId)
+        console.log('Instance: id = ' + instance.InstanceId)
 
         if (shouldStart(instance)) {
-          console.log('Start instance: id = ' + instance.instanceId);
+          console.log('Start instance: id = ' + instance.InstanceId);
           handleInstance(ec2, instance, 'start', function() { callback(); });
         } else if (shouldStop(instance)) {
-          console.log('Stop instance: id = ' + instance.instanceId);
+          console.log('Stop instance: id = ' + instance.InstanceId);
           handleInsrance(ec2, instance, 'stop', function() { callback(); });
         }
       }, function() {
