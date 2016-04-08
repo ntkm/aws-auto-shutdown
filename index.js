@@ -74,7 +74,7 @@ exports.handler = function(event, context) {
     Filters: [
       {
         Name: 'tag-key',
-        Values: ['Start']
+        Values: ['Start', 'End']
       }
     ]
   };
